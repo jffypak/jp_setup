@@ -15,7 +15,7 @@ task install: %i[submodule_init submodules] do
 
   # this has all the runcoms from this directory.
   install_files(Dir.glob('git/*')) if want_to_install?('git configs (color, aliases)')
-  install_files(Dir.glob('ctags/*')) if want_to_install?('ctags config (better js/ruby support)')
+  install_ctags if want_to_install?('ctags config (TypeScript/Python/Go)')
   install_files(Dir.glob('tmux/*')) if want_to_install?('tmux config')
   install_files(Dir.glob('vimify/*')) if want_to_install?('vimification of command line tools')
   if want_to_install?('vim configuration (highly recommended)')
@@ -31,6 +31,11 @@ task install: %i[submodule_init submodules] do
   end
 
   success_msg('installed')
+end
+
+desc 'Generate ctags for the current directory: rake -f ~/.jp_setup/Rakefile tags'
+task :tags do
+  run %( ctags -R . )
 end
 
 task :install_plugins do
@@ -130,7 +135,7 @@ def install_homebrew
   puts '======================================================'
   puts 'Installing Homebrew packages...There may be some warnings.'
   puts '======================================================'
-  run %(brew install zsh ctags git hub tmux reattach-to-user-namespace the_silver_searcher ghi fontconfig fzf)
+  run %(brew install zsh universal-ctags git hub tmux reattach-to-user-namespace the_silver_searcher ghi fontconfig fzf ripgrep fd tree-sitter)
   puts
   puts
 end
@@ -172,19 +177,22 @@ def install_lvim
 
   run %( command -v nvim ) # fail early if nvim missing
 
-  run %( curl -s https://raw.githubusercontent.com/lunarvim/lunarvim/master/utils/installer/install.sh | LV_BRANCH='release-1.2/neovim-0.8' bash )
+  # Ensure common XDG dirs exist (installer can be picky)
+  FileUtils.mkdir_p(File.join(ENV['HOME'], '.config', 'lvim'))
+  FileUtils.mkdir_p(File.join(ENV['HOME'], '.local', 'bin'))
+  FileUtils.mkdir_p(File.join(ENV['HOME'], '.local', 'share'))
+
+  # Run installer non-interactively (auto-yes to deps prompts)
+  run %( yes | curl -s https://raw.githubusercontent.com/lunarvim/lunarvim/master/utils/installer/install.sh | LV_BRANCH='release-1.2/neovim-0.8' bash )
 
   puts
   puts 'symlinking lunarvim config'
-  run %( mkdir -p "$HOME/.config" )
   run %( ln -nfs "$HOME/.jp_setup/lunarvim/config" "$HOME/.config/lvim" )
 
   puts
   puts 'ensuring lvim is on PATH'
-  # Most common install location:
   run %( test -x "$HOME/.local/bin/lvim" )
 
-  # Optional: if your shell doesn’t include ~/.local/bin by default, add it to zshrc
   run %( grep -q 'export PATH="$HOME/.local/bin:$PATH"' "$HOME/.jp_setup/zsh/zshrc" || echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.jp_setup/zsh/zshrc" )
 end
 
@@ -253,6 +261,26 @@ def install_files(files, method = :symlink)
     puts '=========================================================='
     puts
   end
+end
+
+def install_ctags
+  puts
+  puts '======================================================'
+  puts 'Installing Universal Ctags config'
+  puts '======================================================'
+
+  run %( mkdir -p "$HOME/.ctags.d" )
+
+  # Symlink every file in repo ctags/ctags.d into ~/.ctags.d
+  Dir.glob(File.join(ENV['HOME'], '.jp_setup', 'ctags', 'ctags.d', '*')).each do |src|
+    next unless File.file?(src)
+    base = File.basename(src)
+    run %( ln -nfs "#{src}" "$HOME/.ctags.d/#{base}" )
+  end
+
+  # Optional: sanity check what ctags you have
+  run %( command -v ctags )
+  run %( ctags --version )
 end
 
 def success_msg(action)
