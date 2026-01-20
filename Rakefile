@@ -11,7 +11,7 @@ task install: %i[submodule_init submodules] do
   puts '======================================================'
   puts
 
-  install_homebrew if RUBY_PLATFORM.downcase.include?('darwin')
+  install_homebrew
 
   # this has all the runcoms from this directory.
   install_files(Dir.glob('git/*')) if want_to_install?('git configs (color, aliases)')
@@ -22,7 +22,7 @@ task install: %i[submodule_init submodules] do
     install_files(Dir.glob('{vim,vimrc}'))
   end
 
-  Rake::Task['install_prezto'].execute
+  Rake::Task['install_plugins'].execute
 
   if want_to_install?('neovim, lunarvim, and fonts')
     install_nvim
@@ -33,8 +33,8 @@ task install: %i[submodule_init submodules] do
   success_msg('installed')
 end
 
-task :install_prezto do
-  install_prezto if want_to_install?('zsh enhancements & prezto')
+task :install_plugins do
+  install_plugins if want_to_install?('zsh enhancements & prezto')
 end
 
 desc 'Updates the installation'
@@ -43,7 +43,7 @@ task :update do
 end
 
 task :submodule_init do
-  run %( git submodule update --init --recursive ) unless ENV['SKIP_SUBMODULES']
+  run %( cd $HOME/.jp_setup && git submodule update --init --recursive ) unless ENV['SKIP_SUBMODULES']
 end
 
 desc 'Init and update submodules.'
@@ -56,8 +56,9 @@ task :submodules do
     run %(
       cd $HOME/.jp_setup
       git submodule update --recursive
-      git clean -df
     )
+
+    run %( git clean -df ) if ENV['CLEAN']
     puts
   end
 end
@@ -68,7 +69,44 @@ private
 
 def run(cmd)
   puts "[Running] #{cmd}"
-  `#{cmd}` unless ENV['DEBUG']
+  return if ENV['DEBUG']
+
+  ok = system(cmd)
+  raise "Command failed (exit #{$CHILD_STATUS.exitstatus}): #{cmd}" unless ok
+end
+
+def in_repo
+  %($HOME/.jp_setup)
+end
+
+def ensure_submodule(url, path)
+  repo_root = File.join(ENV['HOME'], '.jp_setup')
+  gitmodules = File.join(repo_root, '.gitmodules')
+
+  # If already listed in .gitmodules, we're good.
+  if File.exist?(gitmodules) && File.read(gitmodules).include?(path)
+    return
+  end
+
+  # If the directory exists but isn't a registered submodule, bail with guidance.
+  full_path = File.join(repo_root, path)
+  if File.exist?(full_path) && !(File.exist?(gitmodules) && File.read(gitmodules).include?(path))
+    raise "Path exists but is not a submodule: #{full_path}. Remove it or convert it, then rerun."
+  end
+
+  run %(
+    cd #{in_repo}
+    mkdir -p "#{File.dirname(path)}"
+    git submodule add "#{url}" "#{path}"
+  )
+end
+
+
+def update_submodules
+  run %(
+    cd #{in_repo}
+    git submodule update --init --recursive
+  )
 end
 
 def install_homebrew
@@ -78,7 +116,7 @@ def install_homebrew
     puts "Installing Homebrew, the OSX package manager...If it's"
     puts 'already installed, this will do nothing.'
     puts '======================================================'
-    run %{bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"}
+    run %{/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"}
   end
 
   puts
@@ -112,40 +150,61 @@ end
 def install_nvim
   puts
   puts 'installing neovim'
-  run %(brew install neovim)
-  puts
-  puts 'symlinking neovim'
 
-  run %( ln -nfs "$HOME/.jp_setup/nvim" "$HOME/.local/share" )
+  if RUBY_PLATFORM.downcase.include?('darwin')
+    run %( brew install neovim )
+  elsif RUBY_PLATFORM.downcase.include?('linux')
+    # Choose one (package manager varies). This is a reasonable default:
+    run %( sudo apt-get update && sudo apt-get install -y neovim )
+  else
+    puts 'Unknown platform; skipping neovim install'
+  end
+
+  puts
+  puts 'symlinking neovim config'
+  run %( mkdir -p "$HOME/.config" )
   run %( ln -nfs "$HOME/.jp_setup/nvim/config" "$HOME/.config/nvim" )
 end
 
 def install_lvim
   puts
   puts 'installing lunarvim'
-  run %(LV_BRANCH='release-1.2/neovim-0.8' bash <(curl -s https://raw.githubusercontent.com/lunarvim/lunarvim/master/utils/installer/install.sh))
-  puts
-  puts 'symlinking lunarvim'
 
-  run %( ln -nfs "$HOME/.jp_setup/lunarvim/" "$HOME/.local/share" )
+  run %( command -v nvim ) # fail early if nvim missing
+
+  run %( curl -s https://raw.githubusercontent.com/lunarvim/lunarvim/master/utils/installer/install.sh | LV_BRANCH='release-1.2/neovim-0.8' bash )
+
+  puts
+  puts 'symlinking lunarvim config'
+  run %( mkdir -p "$HOME/.config" )
   run %( ln -nfs "$HOME/.jp_setup/lunarvim/config" "$HOME/.config/lvim" )
+
+  puts
+  puts 'ensuring lvim is on PATH'
+  # Most common install location:
+  run %( test -x "$HOME/.local/bin/lvim" )
+
+  # Optional: if your shell doesn’t include ~/.local/bin by default, add it to zshrc
+  run %( grep -q 'export PATH="$HOME/.local/bin:$PATH"' "$HOME/.jp_setup/zsh/zshrc" || echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.jp_setup/zsh/zshrc" )
 end
 
-def install_prezto
+
+def install_plugins
   puts
   puts 'Installing ZSH Enhancements...'
 
   run %( ln -nfs "$HOME/.jp_setup/zsh/zshrc" "$HOME/.zshrc" )
+  run %( mkdir -p "$HOME/.jp_setup/zsh/zsh/ohmyzsh/custom/plugins" )
+  run %( mkdir -p "$HOME/.jp_setup/zsh/zsh/ohmyzsh/custom/themes" )
 
-  run %(
-    cd $HOME/.jp_setup/zsh/zsh
-    git clone https://github.com/ohmyzsh/ohmyzsh.git
-  )
+  ensure_submodule('https://github.com/ohmyzsh/ohmyzsh', 'zsh/zsh/ohmyzsh')
+  ensure_submodule('https://github.com/junegunn/fzf', 'zsh/zsh/fzf')
+  update_submodules
 
   run %(
     cd $HOME/.jp_setup/zsh/zsh/ohmyzsh/custom/plugins
-    git clone https://github.com/zsh-users/zsh-syntax-highlighting.git
-    git clone https://github.com/zsh-users/zsh-autosuggestions.git
+    [ -d zsh-syntax-highlighting ] || git clone https://github.com/zsh-users/zsh-syntax-highlighting.git
+    [ -d zsh-autosuggestions ] || git clone https://github.com/zsh-users/zsh-autosuggestions.git
     cp $HOME/.jp_setup/zsh/cobalt2.zsh-theme $HOME/.jp_setup/zsh/zsh/ohmyzsh/custom/themes
   )
 
