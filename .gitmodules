@@ -1,0 +1,6 @@
+[submodule "zsh/zsh/ohmyzsh"]
+	path = zsh/zsh/ohmyzsh
+	url = https://github.com/ohmyzsh/ohmyzsh
+[submodule "zsh/zsh/fzf"]
+	path = zsh/zsh/fzf
+	url = https://github.com/junegunn/fzf

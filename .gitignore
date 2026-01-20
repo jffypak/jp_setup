@@ -17,5 +17,7 @@ bin/subl
 nvim/telescope_history
 nvim
 tags
-zsh/zsh/
-zsh/prezto/
+!zsh/
+!zsh/zsh/
+!zsh/zsh/ohmyzsh/
+!zsh/zsh/fzf/
