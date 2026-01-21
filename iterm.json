@@ -25,7 +25,7 @@
     "Blue Component" : 0.92148995399475098,
     "Green Component" : 0.92147433757781982
   },
-  "Normal Font" : "FiraCode-Regular 15",
+  "Normal Font" : "FiraCodeNF-Reg 15",
   "Ansi 0 Color" : {
     "Red Component" : 0.10051589459180832,
     "Color Space" : "Calibrated",
@@ -36,7 +36,13 @@
   "Guid" : "87E80345-C3DE-4771-8821-F3DEEBD35C7C",
   "Rows" : 87,
   "Default Bookmark" : "No",
-  "Horizontal Spacing" : 1,
+  "Ansi 2 Color" : {
+    "Red Component" : 0.59473341703414917,
+    "Color Space" : "Calibrated",
+    "Alpha Component" : 1,
+    "Blue Component" : 0.14004382491111755,
+    "Green Component" : 0.87921047210693359
+  },
   "Cursor Guide Color" : {
     "Red Component" : 0.64999997615814209,
     "Color Space" : "Calibrated",
@@ -319,7 +325,7 @@
     "Blue Component" : 0.92060363292694092,
     "Green Component" : 0.81977206468582153
   },
-  "Name" : "Default",
+  "Name" : "jp setup",
   "Cursor Text Color" : {
     "Red Component" : 0,
     "Color Space" : "Calibrated",
@@ -344,13 +350,7 @@
     "Blue Component" : 0.3728577196598053,
     "Green Component" : 0
   },
-  "Ansi 2 Color" : {
-    "Red Component" : 0.59473341703414917,
-    "Color Space" : "Calibrated",
-    "Alpha Component" : 1,
-    "Blue Component" : 0.14004382491111755,
-    "Green Component" : 0.87921047210693359
-  },
+  "Custom Directory" : "No",
   "Link Color" : {
     "Red Component" : 0.023000000044703484,
     "Color Space" : "Calibrated",
@@ -358,7 +358,7 @@
     "Blue Component" : 0.67799997329711914,
     "Green Component" : 0.27000001072883606
   },
-  "Custom Directory" : "No",
+  "Horizontal Spacing" : 1,
   "Right Option Key Sends" : 0,
   "Ansi 3 Color" : {
     "Red Component" : 0.99215686321258545,

@@ -80,6 +80,12 @@ def run(cmd)
   raise "Command failed (exit #{$CHILD_STATUS.exitstatus}): #{cmd}" unless ok
 end
 
+def run_allow_fail(cmd)
+  puts "[Running] #{cmd}"
+  return true if ENV['DEBUG']
+  system(cmd)
+end
+
 def in_repo
   %($HOME/.jp_setup)
 end
@@ -183,7 +189,21 @@ def install_lvim
   FileUtils.mkdir_p(File.join(ENV['HOME'], '.local', 'share'))
 
   # Run installer non-interactively (auto-yes to deps prompts)
-  run %( yes | curl -s https://raw.githubusercontent.com/lunarvim/lunarvim/master/utils/installer/install.sh | LV_BRANCH='release-1.2/neovim-0.8' bash )
+  ok = run_allow_fail(%(
+    yes | curl -s https://raw.githubusercontent.com/lunarvim/lunarvim/master/utils/installer/install.sh \
+    | LV_BRANCH='master' bash
+  ))
+
+  lvim_path = File.join(ENV['HOME'], '.local', 'bin', 'lvim')
+
+  unless ok
+    if File.exist?(lvim_path)
+      puts "[Warn] LunarVim installer exited non-zero during plugin verification."
+      puts "       LunarVim is installed at: #{lvim_path}"
+    else
+      raise "LunarVim installer failed and lvim was not installed."
+    end
+  end
 
   puts
   puts 'symlinking lunarvim config'
@@ -191,11 +211,19 @@ def install_lvim
 
   puts
   puts 'ensuring lvim is on PATH'
-  run %( test -x "$HOME/.local/bin/lvim" )
+  run %( test -x "#{lvim_path}" )
 
   run %( grep -q 'export PATH="$HOME/.local/bin:$PATH"' "$HOME/.jp_setup/zsh/zshrc" || echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.jp_setup/zsh/zshrc" )
-end
 
+  # Best-effort first-time plugin sync (non-fatal)
+  puts
+  puts 'attempting first-time plugin sync (non-fatal if it fails)'
+  run_allow_fail(%( "#{lvim_path}" +PackerSync +q ))
+  run_allow_fail(%( "#{lvim_path}" +LvimSyncCorePlugins +q ))
+
+  puts
+  puts "If plugins still look off, run: lvim then :PackerSync (or :LvimSyncCorePlugins) once."
+end
 
 def install_plugins
   puts
