@@ -286,6 +286,9 @@ openpr() {
   open $URL
 }
 
+# arize
+alias pt="pytest"
+
 
 ################
 # blocksize    #
@@ -481,9 +484,9 @@ source $ZSH/oh-my-zsh.sh
 # prompt       #
 ################
 #Load themes from jp_setup and from user's custom prompts (themes) in ~/.zsh.prompts
-autoload promptinit
-fpath=($HOME/.jp-setup/zsh/prezto-themes $HOME/.zsh.prompts $fpath)
-promptinit
+# autoload promptinit
+# fpath=($HOME/.jp-setup/zsh/prezto-themes $HOME/.zsh.prompts $fpath)
+# promptinit
 # prompt skwp
 # prompt powerline
 
