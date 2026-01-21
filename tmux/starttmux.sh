@@ -6,13 +6,27 @@ if [ "$SESSIONEXISTS" = "" ]
 then
   # create a new tmux session, starting a new vim session
   tmux new-session -d -s $session -n editor
+  tmux send-keys "cd \$HOME/Code/arize" C-m
+  tmux send-keys "conda activate py310" C-m
   tmux send-keys "v" C-m
 
   tmux new-window -n 'shell'
+  tmux send-keys "cd \$HOME/Code/arize" C-m
+  tmux send-keys "conda activate py310" C-m
+  tmux send-keys "c" C-m
   tmux splitw -h -p 50
+  tmux send-keys "cd \$HOME/Code/arize" C-m
+  tmux send-keys "conda activate py310" C-m
+  tmux send-keys "c" C-m
   tmux splitw -v -p 50
+  tmux send-keys "cd \$HOME/Code/arize" C-m
+  tmux send-keys "conda activate py310" C-m
+  tmux send-keys "c" C-m
   tmux selectp -t 1
   tmux splitw -v -p 50
+  tmux send-keys "cd \$HOME/Code/arize" C-m
+  tmux send-keys "conda activate py310" C-m
+  tmux send-keys "c" C-m
 
   # return to main vim window
   tmux select-window -t 'editor'

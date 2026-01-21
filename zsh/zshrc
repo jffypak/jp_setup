@@ -542,3 +542,10 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+source /opt/homebrew/share/kube-ps1.sh
+autoload -Uz vcs_info
+precmd() { vcs_info }
+zstyle ':vcs_info:git:*' formats ' (%b)'
+setopt PROMPT_SUBST
+
+PROMPT='> $(kube_ps1)''%{$fg[cyan]%} | %{$reset_color%}%n | %{$fg[green]%}%~%{$fg[yellow]%}${vcs_info_msg_0_}%{$reset_color%} $ '
