@@ -288,6 +288,35 @@ openpr() {
 
 # arize
 alias pt="pytest"
+alias k="kubectl"
+# ----- Arize port forward aliases -----
+# arize-dev port forwards
+alias postgres_dev_port_forward="kubectl --namespace arize-dev port-forward service/postgres 5432:5432"
+alias druidbroker_dev_port_forward="kubectl --namespace arize-dev port-forward service/druid-broker 8082:8082"
+alias metricscalculator_dev_port_forward="kubectl --namespace arize-dev port-forward service/metricscalculator 6001:50051"
+alias monitorsservice_dev_port_forward="kubectl --namespace arize-dev port-forward service/monitorsservice 6003:50051"
+alias email_dev_port_forward="kubectl --namespace arize-dev port-forward service/email 6004:50051"
+alias fileimporter_dev_port_forward="kubectl --namespace arize-dev port-forward service/fileimporter 6005:50051"
+alias realtimeingestion_dev_port_forward="kubectl --namespace arize-dev port-forward service/realtimeingestion 6006:8080"
+alias gates_dev_port_forward="kubectl --namespace arize-dev port-forward service/gates-queryworker 6007:50051"
+alias dataclusters_dev_port_forward="kubectl --namespace arize-dev port-forward service/dataclusters 6009:50051"
+alias druidimporter_dev_port_forward="kubectl --namespace arize-dev port-forward service/druidimporter 6010:50051"
+alias copilot_dev_port_forward="kubectl --namespace arize-dev port-forward service/copilot 6011:50051"
+alias httpcopilot_dev_port_forward="kubectl --namespace arize-dev port-forward service/copilot 6012:50052"
+alias externalendpoints_dev_port_forward="kubectl --namespace arize-dev port-forward service/externalendpoints 6013:8080"
+alias onlinetaskscoordinator_dev_port_forward="kubectl --namespace arize-dev port-forward service/onlinetasksrunner-coordinator 6014:50051"
+alias onlinetasksworker_dev_port_forward="kubectl --namespace arize-dev port-forward service/onlinetasksrunner-worker 6015:50051"
+alias onlinetaskscoordinatorsse_dev_port_forward="kubectl --namespace arize-dev port-forward service/onlinetasksrunner-coordinator 6016:8085"
+alias auth_dev_port_forward="kubectl --namespace arize-dev port-forward service/auth 6017:50051"
+alias generativeserver_dev_port_forward="kubectl --namespace arize-dev port-forward service/generative-server 6018:6018"
+alias byob_dev_port_forward="kubectl --namespace arize-dev port-forward service/byob-coordinator 6019:50051"
+alias receiver_dev_port_forward="kubectl --namespace arize-dev port-forward service/receiver 6020:4318"
+alias dev_port_forward="postgres_dev_port_forward & druidbroker_dev_port_forward & metricscalculator_dev_port_forward & monitorsservice_dev_port_forward & email_dev_port_forward & fileimporter_dev_port_forward & realtimeingestion_dev_port_forward & gates_dev_port_forward & dataclusters_dev_port_forward & druidimporter_dev_port_forward & copilot_dev_port_forward & httpcopilot_dev_port_forward & externalendpoints_dev_port_forward & onlinetaskscoordinator_dev_port_forward & onlinetasksworker_dev_port_forward & onlinetaskscoordinatorsse_dev_port_forward & auth_dev_port_forward & generativeserver_dev_port_forward & byob_dev_port_forward & receiver_dev_port_forward &"
+alias dfs="dev_port_forward"
+
+# mynamespace port forwards
+alias mynamespace_port_forward=" &"
+alias postgres_mynamespace_port_forward="kubectl --namespace jpark port-forward service/postgres 5432:5432"
 
 
 ################
