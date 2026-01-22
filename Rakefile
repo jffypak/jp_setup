@@ -24,9 +24,9 @@ task install: %i[submodule_init submodules] do
 
   Rake::Task['install_plugins'].execute
 
-  if want_to_install?('neovim, lunarvim, and fonts')
+  if want_to_install?('neovim, lazyvim, and fonts')
     install_nvim
-    install_lvim
+    install_lazyvim
     install_fonts
   end
 
@@ -170,59 +170,44 @@ def install_nvim
   else
     puts 'Unknown platform; skipping neovim install'
   end
-
-  puts
-  puts 'symlinking neovim config'
-  run %( mkdir -p "$HOME/.config" )
-  run %( ln -nfs "$HOME/.jp_setup/nvim/config" "$HOME/.config/nvim" )
 end
 
-def install_lvim
+def install_lazyvim
   puts
-  puts 'installing lunarvim'
+  puts 'installing lazyvim'
 
   run %( command -v nvim ) # fail early if nvim missing
 
-  # Ensure common XDG dirs exist (installer can be picky)
-  FileUtils.mkdir_p(File.join(ENV['HOME'], '.config', 'lvim'))
-  FileUtils.mkdir_p(File.join(ENV['HOME'], '.local', 'bin'))
-  FileUtils.mkdir_p(File.join(ENV['HOME'], '.local', 'share'))
+  nvim_config = File.join(ENV['HOME'], '.config', 'nvim')
+  nvim_data = File.join(ENV['HOME'], '.local', 'share', 'nvim')
+  nvim_state = File.join(ENV['HOME'], '.local', 'state', 'nvim')
+  nvim_cache = File.join(ENV['HOME'], '.cache', 'nvim')
 
-  # Run installer non-interactively (auto-yes to deps prompts)
-  ok = run_allow_fail(%(
-    yes | curl -s https://raw.githubusercontent.com/lunarvim/lunarvim/master/utils/installer/install.sh \
-    | LV_BRANCH='master' bash
-  ))
+  # Backup existing neovim config if it exists and isn't a symlink to our repo
+  if File.exist?(nvim_config) && !File.symlink?(nvim_config)
+    backup_path = "#{nvim_config}.backup.#{Time.now.strftime('%Y%m%d%H%M%S')}"
+    puts "Backing up existing nvim config to #{backup_path}"
+    FileUtils.mv(nvim_config, backup_path)
+  elsif File.symlink?(nvim_config)
+    FileUtils.rm(nvim_config)
+  end
 
-  lvim_path = File.join(ENV['HOME'], '.local', 'bin', 'lvim')
-
-  unless ok
-    if File.exist?(lvim_path)
-      puts "[Warn] LunarVim installer exited non-zero during plugin verification."
-      puts "       LunarVim is installed at: #{lvim_path}"
-    else
-      raise "LunarVim installer failed and lvim was not installed."
+  # Optionally backup data/state/cache (clean slate for LazyVim)
+  [nvim_data, nvim_state, nvim_cache].each do |dir|
+    if File.exist?(dir)
+      backup_path = "#{dir}.backup.#{Time.now.strftime('%Y%m%d%H%M%S')}"
+      puts "Backing up #{dir} to #{backup_path}"
+      FileUtils.mv(dir, backup_path)
     end
   end
 
   puts
-  puts 'symlinking lunarvim config'
-  run %( ln -nfs "$HOME/.jp_setup/lunarvim/config" "$HOME/.config/lvim" )
+  puts 'symlinking lazyvim config from repo'
+  run %( mkdir -p "$HOME/.config" )
+  run %( ln -nfs "$HOME/.jp_setup/lazyvim" "$HOME/.config/nvim" )
 
   puts
-  puts 'ensuring lvim is on PATH'
-  run %( test -x "#{lvim_path}" )
-
-  run %( grep -q 'export PATH="$HOME/.local/bin:$PATH"' "$HOME/.jp_setup/zsh/zshrc" || echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.jp_setup/zsh/zshrc" )
-
-  # Best-effort first-time plugin sync (non-fatal)
-  puts
-  puts 'attempting first-time plugin sync (non-fatal if it fails)'
-  run_allow_fail(%( "#{lvim_path}" +PackerSync +q ))
-  run_allow_fail(%( "#{lvim_path}" +LvimSyncCorePlugins +q ))
-
-  puts
-  puts "If plugins still look off, run: lvim then :PackerSync (or :LvimSyncCorePlugins) once."
+  puts 'LazyVim installed! Run `nvim` to complete setup - plugins will install automatically on first launch.'
 end
 
 def install_plugins
