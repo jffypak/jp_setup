@@ -289,6 +289,7 @@ openpr() {
 # arize
 alias pt="pytest"
 alias k="kubectl"
+alias sc="~/.jp_setup/arize/start_copilot.sh"
 # ----- Arize port forward aliases -----
 # arize-dev port forwards
 alias postgres_dev_port_forward="kubectl --namespace arize-dev port-forward service/postgres 5432:5432"

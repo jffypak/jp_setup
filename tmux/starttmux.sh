@@ -10,19 +10,29 @@ then
   tmux send-keys "conda activate py310" C-m
   tmux send-keys "v" C-m
 
+  # --- shell window ---
   tmux new-window -n 'shell'
   tmux send-keys "cd \$HOME/Code/arize" C-m
   tmux send-keys "conda activate py310" C-m
   tmux send-keys "c" C-m
+
+  # 50/50 left/right
   tmux splitw -h -p 50
+
+  # RIGHT pane: split into 3 vertical panes (33/33/33)
+  tmux select-pane -t 1
   tmux send-keys "cd \$HOME/Code/arize" C-m
   tmux send-keys "conda activate py310" C-m
   tmux send-keys "c" C-m
-  tmux splitw -v -p 50
+
+  # first vertical split (top 66%, bottom 33%)
+  tmux splitw -v -p 75
   tmux send-keys "cd \$HOME/Code/arize" C-m
   tmux send-keys "conda activate py310" C-m
   tmux send-keys "c" C-m
-  tmux selectp -t 1
+
+  # split the top-right pane again to make 33/33/33
+  tmux select-pane -t 1
   tmux splitw -v -p 50
   tmux send-keys "cd \$HOME/Code/arize" C-m
   tmux send-keys "conda activate py310" C-m
@@ -30,8 +40,8 @@ then
 
   # return to main vim window
   tmux select-window -t 'editor'
-  tmux selectp -t 1
+  tmux select-pane -t 1
 
-  # Finished setup, attach to the tmux session!
+  # attach
   tmux attach-session -t $session
 fi
