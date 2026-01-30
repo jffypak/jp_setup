@@ -22,6 +22,8 @@ export GLOBAL_ID_HMAC_SECRET="$GLOBAL_ID_HMAC_SECRET"
 
 # 3) Streaming secret (can be any arbitrary string)
 export STREAM_LOCATOR_SECRET="${STREAM_LOCATOR_SECRET:-secret}"
+export ARIZE_DEV_SPACE_ID="$ARIZE_DEV_SPACE_ID"
+export ARIZE_DEV_API_SERVICE_KEY="$ARIZE_DEV_API_SERVICE_KEY"
 
 # 4) Start Copilot server
 cd $HOME/Code/arize/copilot
@@ -29,7 +31,6 @@ exec python server.py \
   --grpc-port=6011 \
   --http-port=6012 \
   --planner-persistence-mode=database \
-  --log-to-arize \
-  --reload
+  --log-to-arize
 
 # might need to --log-to-phoenix

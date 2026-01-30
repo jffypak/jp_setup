@@ -288,6 +288,7 @@ openpr() {
 
 # arize
 alias pt="pytest"
+function ptc { pytest $(git diff --name-only HEAD | grep -E 'test_.*\.py$|_test\.py$') }
 alias k="kubectl"
 alias sc="~/.jp_setup/arize/start_copilot.sh"
 # ----- Arize port forward aliases -----
@@ -312,7 +313,7 @@ alias auth_dev_port_forward="kubectl --namespace arize-dev port-forward service/
 alias generativeserver_dev_port_forward="kubectl --namespace arize-dev port-forward service/generative-server 6018:6018"
 alias byob_dev_port_forward="kubectl --namespace arize-dev port-forward service/byob-coordinator 6019:50051"
 alias receiver_dev_port_forward="kubectl --namespace arize-dev port-forward service/receiver 6020:4318"
-alias dev_port_forward="postgres_dev_port_forward & druidbroker_dev_port_forward & metricscalculator_dev_port_forward & monitorsservice_dev_port_forward & email_dev_port_forward & fileimporter_dev_port_forward & realtimeingestion_dev_port_forward & gates_dev_port_forward & dataclusters_dev_port_forward & druidimporter_dev_port_forward & copilot_dev_port_forward & httpcopilot_dev_port_forward & externalendpoints_dev_port_forward & onlinetaskscoordinator_dev_port_forward & onlinetasksworker_dev_port_forward & onlinetaskscoordinatorsse_dev_port_forward & auth_dev_port_forward & generativeserver_dev_port_forward & byob_dev_port_forward & receiver_dev_port_forward &"
+alias dev_port_forward="postgres_dev_port_forward & druidbroker_dev_port_forward & metricscalculator_dev_port_forward & monitorsservice_dev_port_forward & email_dev_port_forward & fileimporter_dev_port_forward & realtimeingestion_dev_port_forward & gates_dev_port_forward & dataclusters_dev_port_forward & druidimporter_dev_port_forward & externalendpoints_dev_port_forward & onlinetaskscoordinator_dev_port_forward & onlinetasksworker_dev_port_forward & onlinetaskscoordinatorsse_dev_port_forward & auth_dev_port_forward & generativeserver_dev_port_forward & byob_dev_port_forward & receiver_dev_port_forward &"
 alias dfs="dev_port_forward"
 
 # mynamespace port forwards
@@ -384,6 +385,7 @@ fco() {
 # Key bindings
 # ------------
 [[ -f "$HOME/.jp_setup/zsh/zsh/fzf/shell/completion.zsh" ]] && source "$HOME/.jp_setup/zsh/zsh/fzf/shell/completion.zsh"
+[[ -f "$HOME/.jp_setup/zsh/zsh/fzf/shell/key-bindings.zsh" ]] && source "$HOME/.jp_setup/zsh/zsh/fzf/shell/key-bindings.zsh"
 
 ################
 # git          #
