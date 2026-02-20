@@ -26,7 +26,7 @@ export ARIZE_DEV_SPACE_ID="$ARIZE_DEV_SPACE_ID"
 export ARIZE_DEV_API_SERVICE_KEY="$ARIZE_DEV_API_SERVICE_KEY"
 
 # 4) Start Copilot server
-cd $HOME/Code/arize/copilot
+cd "$HOME/Code/arize/copilot"
 exec python server.py \
   --grpc-port=6011 \
   --http-port=6012 \

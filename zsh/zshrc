@@ -40,7 +40,7 @@ alias .6='cd ../../../../../../'            # Go back 6 directory levels
 alias cls='clear;ls'
 
 # Copying
-alias pbcopy='xclip -sel clip'
+# alias pbcopy='xclip -sel clip'
 
 # Show human friendly numbers and colors
 alias df='df -h'
@@ -289,6 +289,9 @@ openpr() {
 # arize
 alias pt="pytest"
 function ptc { pytest $(git diff --name-only HEAD | grep -E 'test_.*\.py$|_test\.py$') }
+alias arize="cd ~/Code/arize/"
+alias copilot="cd ~/Code/arize/copilot/"
+alias arizeweb= "cd ~/Code/arize/arizeweb/"
 alias k="kubectl"
 alias sc="~/.jp_setup/arize/start_copilot.sh"
 # ----- Arize port forward aliases -----
@@ -550,14 +553,14 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/Users/arizeuser/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+__conda_setup="$("$HOME/miniconda3/bin/conda" 'shell.zsh' 'hook' 2> /dev/null)"
 if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
-    if [ -f "/Users/arizeuser/miniconda3/etc/profile.d/conda.sh" ]; then
-        . "/Users/arizeuser/miniconda3/etc/profile.d/conda.sh"
+    if [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "$HOME/miniconda3/etc/profile.d/conda.sh"
     else
-        export PATH="/Users/arizeuser/miniconda3/bin:$PATH"
+        export PATH="$HOME/miniconda3/bin:$PATH"
     fi
 fi
 unset __conda_setup
@@ -571,7 +574,7 @@ export NVM_DIR="$HOME/.nvm"
 
 
 # pnpm
-export PNPM_HOME="/Users/arizeuser/Library/pnpm"
+export PNPM_HOME="$HOME/Library/pnpm"
 case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
   *) export PATH="$PNPM_HOME:$PATH" ;;
