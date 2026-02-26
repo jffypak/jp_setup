@@ -2,6 +2,12 @@
 
 local map = vim.keymap.set
 
+-- Find files from cwd instead of root dir
+map("n", "<leader><space>", LazyVim.pick("files", { root = false }), { desc = "Find Files (cwd)" })
+
+-- Grep from cwd instead of root dir
+map("n", "<leader>/", LazyVim.pick("live_grep", { root = false }), { desc = "Grep (cwd)" })
+
 -- Save with Ctrl+S
 map("n", "<C-s>", "<cmd>w<cr>", { desc = "Save file" })
 
