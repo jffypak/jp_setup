@@ -4,3 +4,6 @@
 [submodule "zsh/zsh/fzf"]
 	path = zsh/zsh/fzf
 	url = https://github.com/junegunn/fzf
+[submodule "everything-claude-code"]
+	path = everything-claude-code
+	url = https://github.com/affaan-m/everything-claude-code.git
