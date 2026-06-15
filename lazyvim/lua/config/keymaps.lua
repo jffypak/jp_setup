@@ -20,6 +20,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(args)
     local opts = { buffer = args.buf }
     map("n", "<leader>lr", "<cmd>Telescope lsp_references<cr>", vim.tbl_extend("force", opts, { desc = "Find References" }))
+    map("n", "<leader>gv", function()
+      vim.cmd("vsplit")
+      vim.lsp.buf.definition()
+    end, vim.tbl_extend("force", opts, { desc = "Go to Definition (vsplit)" }))
     map("n", "<leader>lR", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Rename" }))
     map("n", "<leader>lf", function()
       require("conform").format({ async = false, lsp_fallback = true })

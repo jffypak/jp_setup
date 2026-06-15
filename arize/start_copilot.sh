@@ -4,7 +4,8 @@ set -euo pipefail
 # Run from the repo root (or adjust paths below if needed)
 
 # 1) Load env vars used by arizeweb (includes GLOBAL_ID_HMAC_SECRET)
-ENV_FILE="$HOME/Code/arize/arizeweb/.env"
+ENV_FILE="$HOME/Code/arize/.env"
+ARIZE_ENV_FILE="$HOME/Code/arize/arizeweb/.env"
 if [[ ! -f "$ENV_FILE" ]]; then
   echo "Error: env file not found at: $ENV_FILE"
   exit 1
@@ -12,6 +13,7 @@ fi
 
 # shellcheck disable=SC1090
 source "$ENV_FILE"
+source "$ARIZE_ENV_FILE"
 
 # 2) Ensure GLOBAL_ID_HMAC_SECRET is exported (for relay global id encoding)
 if [[ -z "${GLOBAL_ID_HMAC_SECRET:-}" ]]; then
@@ -31,6 +33,6 @@ exec python server.py \
   --grpc-port=6011 \
   --http-port=6012 \
   --planner-persistence-mode=database \
-  --log-to-arize
+  --log-to-arize #\
 
 # might need to --log-to-phoenix

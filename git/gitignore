@@ -5,7 +5,6 @@ Library/
 Music/
 Pictures/
 Applications/
-go/
 # Thumbnails
 ._*
 .*
@@ -62,3 +61,7 @@ node_modules/
 tmp/
 cache/
 vendor/
+
+# personal local-only edits
+# ----------------------------------------------------------------------------------------------
+go/internal/sweeper/sweeper.go

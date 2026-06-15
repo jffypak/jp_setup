@@ -3,7 +3,7 @@ set -eu
 
 session="main"
 root="$HOME/Code/arize"
-env_cmd="conda activate py310"
+env_cmd="conda activate py311"
 
 # Saved (captured) layout for your usual terminal size
 shell_layout='8aff,341x64,0,0[341x17,0,0{82x17,0,0,1,118x17,83,0,3,139x17,202,0,4},341x46,0,18,2]'

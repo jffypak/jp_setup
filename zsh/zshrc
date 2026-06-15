@@ -219,12 +219,6 @@ alias weatherlong="curl -s 'wttr.in/?format=v2'"
 function cd {
     builtin cd "$@" && ls -lh;
 }
-
-#Database stuff
-alias start_postgres="pg_ctl -D /usr/local/var/postgres start"
-alias stop_postgres="pg_ctl -D /usr/local/var/postgres stop -s -m fast"
-alias pgup="start_postgres"
-alias pgdown="stop_postgres"
 alias start_mysql="mysql.server start"
 alias stop_mysql="mysql.server stop"
 alias mysqlup="start_mysql"
@@ -316,11 +310,23 @@ alias auth_dev_port_forward="kubectl --namespace arize-dev port-forward service/
 alias generativeserver_dev_port_forward="kubectl --namespace arize-dev port-forward service/generative-server 6018:6018"
 alias byob_dev_port_forward="kubectl --namespace arize-dev port-forward service/byob-coordinator 6019:50051"
 alias receiver_dev_port_forward="kubectl --namespace arize-dev port-forward service/receiver 6020:4318"
-alias dev_port_forward="postgres_dev_port_forward & druidbroker_dev_port_forward & metricscalculator_dev_port_forward & monitorsservice_dev_port_forward & email_dev_port_forward & fileimporter_dev_port_forward & realtimeingestion_dev_port_forward & gates_dev_port_forward & dataclusters_dev_port_forward & druidimporter_dev_port_forward & externalendpoints_dev_port_forward & onlinetaskscoordinator_dev_port_forward & onlinetasksworker_dev_port_forward & onlinetaskscoordinatorsse_dev_port_forward & auth_dev_port_forward & generativeserver_dev_port_forward & byob_dev_port_forward & receiver_dev_port_forward &"
-alias dfs="dev_port_forward"
+alias dev_port_forward="pkill -f port-forward; sleep 3; kuc dev; postgres_port_forward \
+ & druidbroker_port_forward \
+ & metricscalculator_port_forward \
+ & dataclusters_port_forward \
+ & monitorsservice_port_forward \
+ & auth_port_forward \
+ & externalendpoints_port_forward \
+ & onlinetaskscoordinator_port_forward \
+ & onlinetasksworker_port_forward \
+ & onlinetaskscoordinatorsse_port_forward \
+ & generativeserver_port_forward \
+ &"
+alias dfs="/Users/jpark/Code/arize/arizeweb/scripts/rock_solid_port_forward.sh --no-copilot"
+
 
 # mynamespace port forwards
-alias mynamespace_port_forward="pkill -f port-forward; kuc mynamespace; postgres_port_forward \
+alias mynamespace_port_forward="pkill -f port-forward; sleep 3; kuc mynamespace; postgres_port_forward \
  & druidbroker_port_forward \
  & metricscalculator_port_forward \
  & monitorsservice_port_forward \
@@ -363,7 +369,7 @@ alias buildifier="/private/var/tmp/_bazel*jackzhou/7643290ca9e9f24e2edf31bd7e4c5
 
 ## Programs
 alias jl="jupyter lab --port=8888 --port-retries=0 --NotebookApp.token='abc123' --notebook-dir='~/src/arize/copilot' --no-browser"
-alias cop="python server.py --grpc-port=6011 --http-port=6012 --planner-persistence-mode=database --log-to-phoenix --reload --log-to-arize"
+alias cop="python copilot/server.py --grpc-port=6011 --http-port=6012 --planner-persistence-mode=database --log-to-phoenix --reload --log-to-arize"
 alias mc="pkill -f 6001:; go run /Users/jackzhou/src/arize/go/pkg/metricscalculator/main.go --postgres_host=localhost:5432 --postgres_user=postgres --postgres_password_path=\"/Users/jackzhou/pg_pass.txt\" --otel_host=localhost --prom_port=9091 --port=6001 --log_sql=true"
 alias alerting="pkill -f 6003:;cd /Users/jackzhou/src/arize/go/; go run /Users/jackzhou/src/arize/go/pkg/alerting/main.go --dev \
   --postgres_host=localhost \
@@ -374,6 +380,19 @@ alias alerting="pkill -f 6003:;cd /Users/jackzhou/src/arize/go/; go run /Users/j
   --global_id_hmac_secret_path=\"/Users/jackzhou/src/arize/manifests/alerting/secrets/IT/global-id-secret/GLOBAL_ID_HMAC_SECRET\" \
   --monitor_configs_file_path=\"/Users/jackzhou/src/arize/manifests/configurations/dev/common-configs/monitor-configs.yaml\""
 alias pn="panel serve ~/src/arize/copilot/app.py &>~/src/logs/panel.txt"
+
+# Jack aliases
+## Set GLOBAL_ID_HMAC_SECRET based on current kubectl context
+## Usage: set_hmac_env && pnpm run dev
+function set_hmac() {
+  case "$(kubectl config current-context 2>/dev/null)" in
+    mynamespace) export GLOBAL_ID_HMAC_SECRET="fakehmacsecret" ;;
+    dev)         export GLOBAL_ID_HMAC_SECRET="9a2bbea9c0cd59ac13805316507c8c73" ;;
+    prod)        export GLOBAL_ID_HMAC_SECRET="a22652ad692e47b9dea9d1c9ae932044" ;;
+    *)           echo "set_hmac_env: unknown context (expected: mynamespace, dev, prod)" >&2; return 1 ;;
+  esac
+}
+
 
 # ----- Arize port forward aliases (no namespace) -----
 alias postgres_port_forward="kubectl port-forward service/postgres 5432:5432"
@@ -397,7 +416,7 @@ alias onlinetaskscoordinator_port_forward="kubectl port-forward service/onlineta
 alias onlinetasksworker_port_forward="kubectl port-forward service/onlinetasksrunner-worker 6015:50051"
 alias onlinetaskscoordinatorsse_port_forward="kubectl port-forward service/onlinetasksrunner-coordinator 6016:8085"
 alias generativeserver_port_forward="kubectl port-forward service/generative-server 6018"
-alias prod_port_forward="pkill -f port-forward; kuc prod; postgres_port_forward \
+alias prod_port_forward="pkill -f port-forward; sleep 3; kuc prod; postgres_port_forward \
  & druidbroker_port_forward \
  & metricscalculator_port_forward \
  & gates_port_forward \
@@ -410,7 +429,7 @@ alias prod_port_forward="pkill -f port-forward; kuc prod; postgres_port_forward 
  & onlinetaskscoordinatorsse_port_forward \
  & generativeserver_port_forward \
  &"
-alias euprod_port_forward="pkill -f port-forward; kuc eu-prod; postgres_port_forward \
+alias euprod_port_forward="pkill -f port-forward; sleep 3; kuc eu-prod; postgres_port_forward \
  & druidbroker_port_forward \
  & metricscalculator_port_forward \
  & gates_port_forward \
@@ -422,11 +441,19 @@ alias euprod_port_forward="pkill -f port-forward; kuc eu-prod; postgres_port_for
  & onlinetasksworker_port_forward \
  & onlinetaskscoordinatorsse_port_forward \
  &"
-alias mynamespace_ingestion="pkill -f port-forward; kuc mynamespace; postgres_port_forward \
+alias mynamespace_ingestion="pkill -f port-forward; sleep 3; kuc mynamespace; postgres_port_forward \
  & druidrouter_port_forward \
  & receiver_port_forward \
  & flight_port_forward \
  &"
+
+alias devapply="bazel run //manifests/copilot:copilot-server-dev.apply"
+
+## Autopilot
+alias sandboxcli="CONTROLLER_ADDR=localhost:6021 bazel-bin/go/cmd/sandboxcli/sandboxcli_/sandboxcli"
+alias sandboxclilocal="CONTROLLER_ADDR=localhost:50055 bazel-bin/go/cmd/sandboxcli/sandboxcli_/sandboxcli"
+
+
 
 ## SSH
 alias sshspotify="gcloud compute ssh --zone \"us-central1-a\" \"ubuntu@jump-vm-spotify\" --project \"arize-on-prem-472876\" -- -L 4040:localhost:4040 -L 50052:localhost:50052"
@@ -476,16 +503,25 @@ if type ag &> /dev/null; then
   # export FZF_DEFAULT_COMMAND="find . -path '*/\.*' -type d -prune -o -type f -print -o -type l -print 2> /dev/null | sed s/^..//"
 fi
 
+deleteoldlocalbranches() {
+  git for-each-ref --format='%(committerdate:unix) %(refname:short)' refs/heads/ | \
+    awk -v cut=$(date -v-2m +%s) '$1<cut{print $2}' | \
+    grep -vE '^(main|jpark/fix-signal-dups|jpark/fix-signal-dups-2|jpark/signal-cost)$' | \
+    xargs -n1 git branch -D
+}
+
 fco() {
   local branches branch
   if [[ $1 == -r ]]; then
-    branches=$(git branch -r) &&
-      branch=$(echo "$branches" | fzf --height 10% +m) &&
-      git checkout $(echo "$branch" | awk '{print $1}' | sed "s/origin\///")
+    branches=$(git for-each-ref --sort=-committerdate refs/remotes/ \
+        --format='%(committerdate:relative)%09%(refname:short)' | grep -v '/HEAD$') &&
+      branch=$(echo "$branches" | column -t -s $'\t' | fzf --height 40% +m) &&
+      git checkout "$(echo "$branch" | awk '{print $NF}' | sed 's#^origin/##')"
   else
-    branches=$(git branch -vv) &&
-      branch=$(echo "$branches" | fzf --height 10% +m) &&
-      git checkout $(echo "$branch" | awk '{print $1}' | sed "s/.* //")
+    branches=$(git for-each-ref --sort=-committerdate refs/heads/ \
+        --format='%(committerdate:relative)%09%(refname:short)') &&
+      branch=$(echo "$branches" | column -t -s $'\t' | fzf --height 40% +m) &&
+      git checkout "$(echo "$branch" | awk '{print $NF}')"
   fi
 }
 
@@ -695,3 +731,7 @@ zstyle ':vcs_info:git:*' formats ' (%b)'
 setopt PROMPT_SUBST
 
 PROMPT='> $(kube_ps1)''%{$fg[cyan]%} | %{$reset_color%}%n | %{$fg[green]%}%~%{$fg[yellow]%}${vcs_info_msg_0_}%{$reset_color%} $ '
+
+
+# Add GOPATH/bin so go-installed tools (gopls, etc.) are on PATH
+export PATH=$PATH:$(go env GOPATH)/bin
