@@ -71,6 +71,12 @@ else
   done
 fi
 
+# --------------------
+# Window 3: agents (agentctl dashboard; stays up after an attach)
+# --------------------
+tmux new-window -t "$session" -n agents -c "$root"
+tmux send-keys -t "$session:agents" "$HOME/Code/agentctl/bin/agentctl tui --stay" C-m
+
 # Back to editor + attach
 tmux select-window -t "$session:editor"
 exec tmux attach -t "$session"
